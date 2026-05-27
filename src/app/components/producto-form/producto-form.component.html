@@ -1,0 +1,173 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Header -->
+      <div class="page-header mb-4">
+        <div class="d-flex align-items-center mb-2">
+          <button class="btn btn-back me-3" (click)="cancelar()">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <div>
+            <h1 class="page-title mb-0">
+              <i [class]="esEdicion ? 'bi bi-pencil-square me-2' : 'bi bi-plus-square me-2'"></i>
+              {{ esEdicion ? 'Editar Producto' : 'Nuevo Producto' }}
+            </h1>
+            <p class="page-subtitle mb-0">
+              {{ esEdicion ? 'Modifica los datos del producto existente' : 'Completa el formulario para agregar un nuevo producto' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted">Cargando datos...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="mensajeError" class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ mensajeError }}
+      </div>
+
+      <!-- Formulario -->
+      <div *ngIf="!cargando" class="card form-card">
+        <div class="card-body p-4">
+          <div [formGroup]="productoForm">
+
+            <div class="row g-3">
+
+              <!-- Nombre -->
+              <div class="col-md-6">
+                <label class="form-label required-label">
+                  <i class="bi bi-tag me-1"></i>Nombre del Producto
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="campoInvalido('nombre')"
+                  formControlName="nombre"
+                  placeholder="Ej: Laptop Dell XPS">
+                <div class="invalid-feedback" *ngIf="campoInvalido('nombre')">
+                  <span *ngIf="f['nombre'].errors?.['required']">El nombre es obligatorio.</span>
+                  <span *ngIf="f['nombre'].errors?.['minlength']">Mínimo 2 caracteres.</span>
+                </div>
+              </div>
+
+              <!-- Categoría -->
+              <div class="col-md-6">
+                <label class="form-label required-label">
+                  <i class="bi bi-folder me-1"></i>Categoría
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [class.is-invalid]="campoInvalido('categoria')"
+                  formControlName="categoria"
+                  placeholder="Ej: Electrónica, Ropa, etc.">
+                <div class="invalid-feedback" *ngIf="campoInvalido('categoria')">
+                  La categoría es obligatoria.
+                </div>
+              </div>
+
+              <!-- Descripción -->
+              <div class="col-12">
+                <label class="form-label required-label">
+                  <i class="bi bi-card-text me-1"></i>Descripción
+                </label>
+                <textarea
+                  class="form-control"
+                  rows="3"
+                  [class.is-invalid]="campoInvalido('descripcion')"
+                  formControlName="descripcion"
+                  placeholder="Describe el producto..."></textarea>
+                <div class="invalid-feedback" *ngIf="campoInvalido('descripcion')">
+                  La descripción es obligatoria.
+                </div>
+              </div>
+
+              <!-- Precio -->
+              <div class="col-md-6">
+                <label class="form-label required-label">
+                  <i class="bi bi-currency-dollar me-1"></i>Precio
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input
+                    type="number"
+                    class="form-control"
+                    [class.is-invalid]="campoInvalido('precio')"
+                    formControlName="precio"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0">
+                  <div class="invalid-feedback" *ngIf="campoInvalido('precio')">
+                    <span *ngIf="f['precio'].errors?.['required']">El precio es obligatorio.</span>
+                    <span *ngIf="f['precio'].errors?.['min']">El precio no puede ser negativo.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stock -->
+              <div class="col-md-6">
+                <label class="form-label required-label">
+                  <i class="bi bi-boxes me-1"></i>Stock
+                </label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [class.is-invalid]="campoInvalido('stock')"
+                  formControlName="stock"
+                  placeholder="0"
+                  min="0">
+                <div class="invalid-feedback" *ngIf="campoInvalido('stock')">
+                  <span *ngIf="f['stock'].errors?.['required']">El stock es obligatorio.</span>
+                  <span *ngIf="f['stock'].errors?.['min']">El stock no puede ser negativo.</span>
+                </div>
+              </div>
+
+              <!-- Estado Activo -->
+              <div class="col-12">
+                <div class="form-check form-switch estado-switch">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="activoSwitch"
+                    formControlName="activo">
+                  <label class="form-check-label" for="activoSwitch">
+                    <i class="bi bi-toggle-on me-1"></i>
+                    Producto activo
+                  </label>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-3 mt-4 pt-3 border-top justify-content-end">
+              <button
+                type="button"
+                class="btn btn-cancelar"
+                (click)="cancelar()"
+                [disabled]="guardando">
+                <i class="bi bi-x-lg me-2"></i>Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-guardar"
+                (click)="guardar()"
+                [disabled]="guardando">
+                <span *ngIf="guardando" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!guardando" [class]="esEdicion ? 'bi bi-save me-2' : 'bi bi-plus-lg me-2'"></i>
+                {{ guardando ? 'Guardando...' : (esEdicion ? 'Actualizar Producto' : 'Guardar Producto') }}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
